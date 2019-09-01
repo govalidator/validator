@@ -19,7 +19,7 @@ func validateFiles(r *http.Request, field, rule, msg string, errsBag url.Values)
 		}
 		if size > l {
 			if msg != "" {
-				errsBag.Add(field, msg)
+				errsBag.Add(field, fmt.Sprintf(msg, l))
 			} else {
 				errsBag.Add(field, fmt.Sprintf("The %s field size is can not be greater than %d bytes", field, l))
 			}
@@ -40,7 +40,7 @@ func validateFiles(r *http.Request, field, rule, msg string, errsBag url.Values)
 		}
 		if !f {
 			if msg != "" {
-				errsBag.Add(field, msg)
+				errsBag.Add(field, fmt.Sprintf(msg, ext))
 			} else {
 				errsBag.Add(field, fmt.Sprintf("The %s field file extension %s is invalid", field, ext))
 			}
@@ -61,7 +61,7 @@ func validateFiles(r *http.Request, field, rule, msg string, errsBag url.Values)
 		}
 		if !f {
 			if msg != "" {
-				errsBag.Add(field, msg)
+				errsBag.Add(field, fmt.Sprintf(msg, mime))
 			} else {
 				errsBag.Add(field, fmt.Sprintf("The %s field file mime %s is invalid", field, mime))
 			}
