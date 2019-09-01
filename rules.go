@@ -305,7 +305,7 @@ func init() {
 
 		err = fmt.Errorf("The %s field must be between %d and %d", field, min, max)
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, min, max)
 		}
 		rv := reflect.ValueOf(value)
 		switch rv.Kind() {
@@ -438,7 +438,7 @@ func init() {
 			err = fmt.Errorf("The %s field must be 1 digit", field)
 		}
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, l)
 		}
 		var str string
 		switch v := value.(type) {
@@ -475,7 +475,7 @@ func init() {
 		}
 		err = fmt.Errorf("The %s field must be digits between %d and %d", field, min, max)
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, min, max)
 		}
 		str := toString(value)
 		if !isNumeric(str) || !(len(str) >= min && len(str) <= max) {
@@ -621,7 +621,7 @@ func init() {
 		}
 		err = fmt.Errorf("The %s field must be length of %d", field, l)
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, l)
 		}
 		rv := reflect.ValueOf(value)
 		switch rv.Kind() {
@@ -653,11 +653,11 @@ func init() {
 		}
 		errMsg := fmt.Errorf("The %s field value can not be less than %d", field, lenInt)
 		if message != "" {
-			errMsg = errors.New(message)
+			errMsg = fmt.Errorf(message, lenInt)
 		}
 		errMsgFloat := fmt.Errorf("The %s field value can not be less than %f", field, lenFloat)
 		if message != "" {
-			errMsgFloat = errors.New(message)
+			errMsgFloat = fmt.Errorf(message, lenFloat)
 		}
 		rv := reflect.ValueOf(value)
 		switch rv.Kind() {
@@ -665,7 +665,7 @@ func init() {
 			inLen := rv.Len()
 			if inLen < lenInt {
 				if message != "" {
-					return errors.New(message)
+					return fmt.Errorf(message, lenInt)
 				}
 				return fmt.Errorf("The %s field must be minimum %d char", field, lenInt)
 			}
@@ -673,7 +673,7 @@ func init() {
 			inLen := rv.Len()
 			if inLen < lenInt {
 				if message != "" {
-					return errors.New(message)
+					return fmt.Errorf(message, lenInt)
 				}
 				return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
 			}
@@ -761,11 +761,11 @@ func init() {
 		}
 		errMsg := fmt.Errorf("The %s field value can not be greater than %d", field, lenInt)
 		if message != "" {
-			errMsg = errors.New(message)
+			errMsg = fmt.Errorf(message, lenInt)
 		}
 		errMsgFloat := fmt.Errorf("The %s field value can not be greater than %f", field, lenFloat)
 		if message != "" {
-			errMsgFloat = errors.New(message)
+			errMsgFloat = fmt.Errorf(message, lenFloat)
 		}
 		rv := reflect.ValueOf(value)
 		switch rv.Kind() {
@@ -773,7 +773,7 @@ func init() {
 			inLen := rv.Len()
 			if inLen > lenInt {
 				if message != "" {
-					return errors.New(message)
+					return fmt.Errorf(message, lenInt)
 				}
 				return fmt.Errorf("The %s field must be maximum %d char", field, lenInt)
 			}
@@ -781,7 +781,7 @@ func init() {
 			inLen := rv.Len()
 			if inLen > lenInt {
 				if message != "" {
-					return errors.New(message)
+					return fmt.Errorf(message, lenInt)
 				}
 				return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
 			}
@@ -925,7 +925,14 @@ func init() {
 		}
 
 		if message != "" {
-			errMsg = errors.New(message)
+			switch {
+			case rng[0] == "":
+				errMsg = fmt.Errorf(message, max)
+			case rng[1] == "":
+				errMsg = fmt.Errorf(message, min)
+			default:
+				errMsg = fmt.Errorf(message, min, max)
+			}
 		}
 
 		val := toString(value)
@@ -967,7 +974,14 @@ func init() {
 		}
 
 		if message != "" {
-			errMsg = errors.New(message)
+			switch {
+			case rng[0] == "":
+				errMsg = fmt.Errorf(message, maxFloat)
+			case rng[1] == "":
+				errMsg = fmt.Errorf(message, minFloat)
+			default:
+				errMsg = fmt.Errorf(message, minFloat, maxFloat)
+			}
 		}
 
 		digit, err := strconv.ParseFloat(val, 64)
@@ -1054,7 +1068,7 @@ func init() {
 		str := toString(value)
 		err := fmt.Errorf("The %s field must be one of %v", field, strings.Join(rng, ", "))
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, strings.Join(rng, ", "))
 		}
 		if !isIn(rng, str) {
 			return err
@@ -1071,7 +1085,7 @@ func init() {
 		str := toString(value)
 		err := fmt.Errorf("The %s field must not be any of %v", field, strings.Join(rng, ", "))
 		if message != "" {
-			err = errors.New(message)
+			err = fmt.Errorf(message, strings.Join(rng, ", "))
 		}
 		if isIn(rng, str) {
 			return err
