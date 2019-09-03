@@ -40,7 +40,7 @@ func validateFiles(r *http.Request, field, rule, msg string, errsBag url.Values)
 		}
 		if !f {
 			if msg != "" {
-				errsBag.Add(field, fmt.Sprintf(msg, ext))
+				errsBag.Add(field, fmt.Sprintf(msg, ext, exts))
 			} else {
 				errsBag.Add(field, fmt.Sprintf("The %s field file extension %s is invalid", field, ext))
 			}
@@ -61,7 +61,7 @@ func validateFiles(r *http.Request, field, rule, msg string, errsBag url.Values)
 		}
 		if !f {
 			if msg != "" {
-				errsBag.Add(field, fmt.Sprintf(msg, mime))
+				errsBag.Add(field, fmt.Sprintf(msg, mime, mimes))
 			} else {
 				errsBag.Add(field, fmt.Sprintf("The %s field file mime %s is invalid", field, mime))
 			}
