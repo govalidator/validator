@@ -163,7 +163,7 @@ func init() {
 			err = errors.New(message)
 		}
 		rxStr := strings.TrimPrefix(rule, "regex:")
-		if !isMatchedRegex(rxStr, str) {
+		if !isEmpty(value) && !isMatchedRegex(rxStr, str) {
 			return err
 		}
 		return nil
@@ -176,7 +176,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isAlpha(str) {
+		if !isEmpty(value) && !isAlpha(str) {
 			return err
 		}
 		return nil
@@ -189,7 +189,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isAlphaDash(str) {
+		if !isEmpty(value) && !isAlphaDash(str) {
 			return err
 		}
 		return nil
@@ -202,7 +202,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isAlphaSpace(str) {
+		if !isEmpty(value) && !isAlphaSpace(str) {
 			return err
 		}
 		return nil
@@ -215,7 +215,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isAlphaNumeric(str) {
+		if !isEmpty(value) && !isAlphaNumeric(str) {
 			return err
 		}
 		return nil
@@ -228,56 +228,58 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		switch t := value.(type) {
-		case bool:
-			//if value is boolean then pass
-		case string:
-			if !isBoolean(t) {
-				return err
-			}
-		case int:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case int8:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case int16:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case int32:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case int64:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uint:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uint8:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uint16:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uint32:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uint64:
-			if t != 0 && t != 1 {
-				return err
-			}
-		case uintptr:
-			if t != 0 && t != 1 {
-				return err
+		if !isEmpty(value) {
+			switch t := value.(type) {
+			case bool:
+				//if value is boolean then pass
+			case string:
+				if !isBoolean(t) {
+					return err
+				}
+			case int:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case int8:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case int16:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case int32:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case int64:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uint:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uint8:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uint16:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uint32:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uint64:
+				if t != 0 && t != 1 {
+					return err
+				}
+			case uintptr:
+				if t != 0 && t != 1 {
+					return err
+				}
 			}
 		}
 		return nil
@@ -307,81 +309,82 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, min, max)
 		}
-		rv := reflect.ValueOf(value)
-		switch rv.Kind() {
-		case reflect.String, reflect.Array, reflect.Map, reflect.Slice:
-			inLen := rv.Len()
-			if !(inLen >= min && inLen <= max) {
-				return err
-			}
-		case reflect.Int:
-			in := value.(int)
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Int8:
-			in := int(value.(int8))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Int16:
-			in := int(value.(int16))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Int32:
-			in := int(value.(int32))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Int64:
-			in := int(value.(int64))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uint:
-			in := int(value.(uint))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uint8:
-			in := int(value.(uint8))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uint16:
-			in := int(value.(uint16))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uint32:
-			in := int(value.(uint32))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uint64:
-			in := int(value.(uint64))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Uintptr:
-			in := int(value.(uintptr))
-			if !(in >= min && in <= max) {
-				return err
-			}
-		case reflect.Float32:
-			in := float64(value.(float32))
-			if !(in >= minFloat && in <= maxFloat) {
-				return fmt.Errorf("The %s field must be between %f and %f", field, minFloat, maxFloat)
-			}
-		case reflect.Float64:
-			in := value.(float64)
-			if !(in >= minFloat && in <= maxFloat) {
-				return fmt.Errorf("The %s field must be between %f and %f", field, minFloat, maxFloat)
-			}
+		if !isEmpty(value) {
+			rv := reflect.ValueOf(value)
+			switch rv.Kind() {
+			case reflect.String, reflect.Array, reflect.Map, reflect.Slice:
+				inLen := rv.Len()
+				if !(inLen >= min && inLen <= max) {
+					return err
+				}
+			case reflect.Int:
+				in := value.(int)
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Int8:
+				in := int(value.(int8))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Int16:
+				in := int(value.(int16))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Int32:
+				in := int(value.(int32))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Int64:
+				in := int(value.(int64))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uint:
+				in := int(value.(uint))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uint8:
+				in := int(value.(uint8))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uint16:
+				in := int(value.(uint16))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uint32:
+				in := int(value.(uint32))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uint64:
+				in := int(value.(uint64))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Uintptr:
+				in := int(value.(uintptr))
+				if !(in >= min && in <= max) {
+					return err
+				}
+			case reflect.Float32:
+				in := float64(value.(float32))
+				if !(in >= minFloat && in <= maxFloat) {
+					return fmt.Errorf("The %s field must be between %f and %f", field, minFloat, maxFloat)
+				}
+			case reflect.Float64:
+				in := value.(float64)
+				if !(in >= minFloat && in <= maxFloat) {
+					return fmt.Errorf("The %s field must be between %f and %f", field, minFloat, maxFloat)
+				}
 
+			}
 		}
-
 		return nil
 	})
 
@@ -393,7 +396,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isCreditCard(str) {
+		if !isEmpty(value) && !isCreditCard(str) {
 			return err
 		}
 		return nil
@@ -406,7 +409,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isCoordinate(str) {
+		if !isEmpty(value) && !isCoordinate(str) {
 			return err
 		}
 		return nil
@@ -419,7 +422,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isCSSColor(str) {
+		if !isEmpty(value) && !isCSSColor(str) {
 			return err
 		}
 		return nil
@@ -440,19 +443,21 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, l)
 		}
-		var str string
-		switch v := value.(type) {
-		case string:
-			str = v
-		case float64:
-			str = toString(int64(v))
-		case float32:
-			str = toString(int64(v))
-		default:
-			str = toString(v)
-		}
-		if len(str) != l || !regexDigits.MatchString(str) {
-			return err
+		if !isEmpty(value) {
+			var str string
+			switch v := value.(type) {
+			case string:
+				str = v
+			case float64:
+				str = toString(int64(v))
+			case float32:
+				str = toString(int64(v))
+			default:
+				str = toString(v)
+			}
+			if len(str) != l || !regexDigits.MatchString(str) {
+				return err
+			}
 		}
 
 		return nil
@@ -477,9 +482,11 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, min, max)
 		}
-		str := toString(value)
-		if !isNumeric(str) || !(len(str) >= min && len(str) <= max) {
-			return err
+		if !isEmpty(value) {
+			str := toString(value)
+			if !isNumeric(str) || !(len(str) >= min && len(str) <= max) {
+				return err
+			}
 		}
 
 		return nil
@@ -489,20 +496,22 @@ func init() {
 	AddCustomRule("date", func(field string, rule string, message string, value interface{}) error {
 		str := toString(value)
 
-		switch rule {
-		case "date:dd-mm-yyyy":
-			if !isDateDDMMYY(str) {
-				if message != "" {
-					return errors.New(message)
+		if !isEmpty(value) {
+			switch rule {
+			case "date:dd-mm-yyyy":
+				if !isDateDDMMYY(str) {
+					if message != "" {
+						return errors.New(message)
+					}
+					return fmt.Errorf("The %s field must be a valid date format. e.g: dd-mm-yyyy, dd/mm/yyyy etc", field)
 				}
-				return fmt.Errorf("The %s field must be a valid date format. e.g: dd-mm-yyyy, dd/mm/yyyy etc", field)
-			}
-		default:
-			if !isDate(str) {
-				if message != "" {
-					return errors.New(message)
+			default:
+				if !isDate(str) {
+					if message != "" {
+						return errors.New(message)
+					}
+					return fmt.Errorf("The %s field must be a valid date format. e.g: yyyy-mm-dd, yyyy/mm/dd etc", field)
 				}
-				return fmt.Errorf("The %s field must be a valid date format. e.g: yyyy-mm-dd, yyyy/mm/dd etc", field)
 			}
 		}
 
@@ -516,7 +525,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isEmail(str) {
+		if !isEmpty(value) && !isEmail(str) {
 			return err
 		}
 		return nil
@@ -529,7 +538,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isFloat(str) {
+		if !isEmpty(value) && !isFloat(str) {
 			return err
 		}
 		return nil
@@ -542,7 +551,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isIP(str) {
+		if !isEmpty(value) && !isIP(str) {
 			return err
 		}
 		return nil
@@ -555,7 +564,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isIPV4(str) {
+		if !isEmpty(value) && !isIPV4(str) {
 			return err
 		}
 		return nil
@@ -568,7 +577,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isIPV6(str) {
+		if !isEmpty(value) && !isIPV6(str) {
 			return err
 		}
 		return nil
@@ -581,7 +590,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isJSON(str) {
+		if !isEmpty(value) && !isJSON(str) {
 			return err
 		}
 		return nil
@@ -594,7 +603,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isLatitude(str) {
+		if !isEmpty(value) && !isLatitude(str) {
 			return err
 		}
 		return nil
@@ -607,7 +616,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isLongitude(str) {
+		if !isEmpty(value) && !isLongitude(str) {
 			return err
 		}
 		return nil
@@ -623,17 +632,19 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, l)
 		}
-		rv := reflect.ValueOf(value)
-		switch rv.Kind() {
-		case reflect.String, reflect.Array, reflect.Map, reflect.Slice:
-			vLen := rv.Len()
-			if vLen != l {
-				return err
-			}
-		default:
-			str := toString(value) //force the value to be string
-			if len(str) != l {
-				return err
+		if !isEmpty(value) {
+			rv := reflect.ValueOf(value)
+			switch rv.Kind() {
+			case reflect.String, reflect.Array, reflect.Map, reflect.Slice:
+				vLen := rv.Len()
+				if vLen != l {
+					return err
+				}
+			default:
+				str := toString(value) //force the value to be string
+				if len(str) != l {
+					return err
+				}
 			}
 		}
 
@@ -659,90 +670,92 @@ func init() {
 		if message != "" {
 			errMsgFloat = fmt.Errorf(message, lenFloat)
 		}
-		rv := reflect.ValueOf(value)
-		switch rv.Kind() {
-		case reflect.String:
-			inLen := rv.Len()
-			if inLen < lenInt {
-				if message != "" {
-					return fmt.Errorf(message, lenInt)
+		if !isEmpty(value) {
+			rv := reflect.ValueOf(value)
+			switch rv.Kind() {
+			case reflect.String:
+				inLen := rv.Len()
+				if inLen < lenInt {
+					if message != "" {
+						return fmt.Errorf(message, lenInt)
+					}
+					return fmt.Errorf("The %s field must be minimum %d char", field, lenInt)
 				}
-				return fmt.Errorf("The %s field must be minimum %d char", field, lenInt)
-			}
-		case reflect.Array, reflect.Map, reflect.Slice:
-			inLen := rv.Len()
-			if inLen < lenInt {
-				if message != "" {
-					return fmt.Errorf(message, lenInt)
+			case reflect.Array, reflect.Map, reflect.Slice:
+				inLen := rv.Len()
+				if inLen < lenInt {
+					if message != "" {
+						return fmt.Errorf(message, lenInt)
+					}
+					return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
 				}
-				return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
-			}
-		case reflect.Int:
-			in := value.(int)
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Int8:
-			in := int(value.(int8))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Int16:
-			in := int(value.(int16))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Int32:
-			in := int(value.(int32))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Int64:
-			in := int(value.(int64))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uint:
-			in := int(value.(uint))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uint8:
-			in := int(value.(uint8))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uint16:
-			in := int(value.(uint16))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uint32:
-			in := int(value.(uint32))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uint64:
-			in := int(value.(uint64))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Uintptr:
-			in := int(value.(uintptr))
-			if in < lenInt {
-				return errMsg
-			}
-		case reflect.Float32:
-			in := value.(float32)
-			if in < float32(lenFloat) {
-				return errMsgFloat
-			}
-		case reflect.Float64:
-			in := value.(float64)
-			if in < lenFloat {
-				return errMsgFloat
-			}
+			case reflect.Int:
+				in := value.(int)
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Int8:
+				in := int(value.(int8))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Int16:
+				in := int(value.(int16))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Int32:
+				in := int(value.(int32))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Int64:
+				in := int(value.(int64))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uint:
+				in := int(value.(uint))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uint8:
+				in := int(value.(uint8))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uint16:
+				in := int(value.(uint16))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uint32:
+				in := int(value.(uint32))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uint64:
+				in := int(value.(uint64))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Uintptr:
+				in := int(value.(uintptr))
+				if in < lenInt {
+					return errMsg
+				}
+			case reflect.Float32:
+				in := value.(float32)
+				if in < float32(lenFloat) {
+					return errMsgFloat
+				}
+			case reflect.Float64:
+				in := value.(float64)
+				if in < lenFloat {
+					return errMsgFloat
+				}
 
+			}
 		}
 
 		return nil
@@ -767,90 +780,92 @@ func init() {
 		if message != "" {
 			errMsgFloat = fmt.Errorf(message, lenFloat)
 		}
-		rv := reflect.ValueOf(value)
-		switch rv.Kind() {
-		case reflect.String:
-			inLen := rv.Len()
-			if inLen > lenInt {
-				if message != "" {
-					return fmt.Errorf(message, lenInt)
+		if !isEmpty(value) {
+			rv := reflect.ValueOf(value)
+			switch rv.Kind() {
+			case reflect.String:
+				inLen := rv.Len()
+				if inLen > lenInt {
+					if message != "" {
+						return fmt.Errorf(message, lenInt)
+					}
+					return fmt.Errorf("The %s field must be maximum %d char", field, lenInt)
 				}
-				return fmt.Errorf("The %s field must be maximum %d char", field, lenInt)
-			}
-		case reflect.Array, reflect.Map, reflect.Slice:
-			inLen := rv.Len()
-			if inLen > lenInt {
-				if message != "" {
-					return fmt.Errorf(message, lenInt)
+			case reflect.Array, reflect.Map, reflect.Slice:
+				inLen := rv.Len()
+				if inLen > lenInt {
+					if message != "" {
+						return fmt.Errorf(message, lenInt)
+					}
+					return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
 				}
-				return fmt.Errorf("The %s field must be minimum %d in size", field, lenInt)
-			}
-		case reflect.Int:
-			in := value.(int)
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Int8:
-			in := int(value.(int8))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Int16:
-			in := int(value.(int16))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Int32:
-			in := int(value.(int32))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Int64:
-			in := int(value.(int64))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uint:
-			in := int(value.(uint))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uint8:
-			in := int(value.(uint8))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uint16:
-			in := int(value.(uint16))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uint32:
-			in := int(value.(uint32))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uint64:
-			in := int(value.(uint64))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Uintptr:
-			in := int(value.(uintptr))
-			if in > lenInt {
-				return errMsg
-			}
-		case reflect.Float32:
-			in := value.(float32)
-			if in > float32(lenFloat) {
-				return errMsgFloat
-			}
-		case reflect.Float64:
-			in := value.(float64)
-			if in > lenFloat {
-				return errMsgFloat
-			}
+			case reflect.Int:
+				in := value.(int)
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Int8:
+				in := int(value.(int8))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Int16:
+				in := int(value.(int16))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Int32:
+				in := int(value.(int32))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Int64:
+				in := int(value.(int64))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uint:
+				in := int(value.(uint))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uint8:
+				in := int(value.(uint8))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uint16:
+				in := int(value.(uint16))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uint32:
+				in := int(value.(uint32))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uint64:
+				in := int(value.(uint64))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Uintptr:
+				in := int(value.(uintptr))
+				if in > lenInt {
+					return errMsg
+				}
+			case reflect.Float32:
+				in := value.(float32)
+				if in > float32(lenFloat) {
+					return errMsgFloat
+				}
+			case reflect.Float64:
+				in := value.(float64)
+				if in > lenFloat {
+					return errMsgFloat
+				}
 
+			}
 		}
 
 		return nil
@@ -863,7 +878,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isMacAddress(str) {
+		if !isEmpty(value) && !isMacAddress(str) {
 			return err
 		}
 		return nil
@@ -876,7 +891,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isNumeric(str) {
+		if !isEmpty(value) && !isNumeric(str) {
 			return err
 		}
 		return nil
@@ -937,13 +952,15 @@ func init() {
 
 		val := toString(value)
 
-		if !strings.Contains(rng[0], ".") || !strings.Contains(rng[1], ".") {
-			digit, errs := strconv.Atoi(val)
-			if errs != nil {
-				return errMsg
-			}
-			if !(digit >= min && digit <= max) {
-				return errMsg
+		if !isEmpty(value) {
+			if !strings.Contains(rng[0], ".") || !strings.Contains(rng[1], ".") {
+				digit, errs := strconv.Atoi(val)
+				if errs != nil {
+					return errMsg
+				}
+				if !(digit >= min && digit <= max) {
+					return errMsg
+				}
 			}
 		}
 		// check for float value
@@ -984,12 +1001,14 @@ func init() {
 			}
 		}
 
-		digit, err := strconv.ParseFloat(val, 64)
-		if err != nil {
-			return errMsg
-		}
-		if !(digit >= minFloat && digit <= maxFloat) {
-			return errMsg
+		if !isEmpty(value) {
+			digit, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				return errMsg
+			}
+			if !(digit >= minFloat && digit <= maxFloat) {
+				return errMsg
+			}
 		}
 		return nil
 	})
@@ -1001,7 +1020,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isURL(str) {
+		if !isEmpty(value) && !isURL(str) {
 			return err
 		}
 		return nil
@@ -1014,7 +1033,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isUUID(str) {
+		if !isEmpty(value) && !isUUID(str) {
 			return err
 		}
 		return nil
@@ -1027,7 +1046,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isUUID3(str) {
+		if !isEmpty(value) && !isUUID3(str) {
 			return err
 		}
 		return nil
@@ -1040,7 +1059,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isUUID4(str) {
+		if !isEmpty(value) && !isUUID4(str) {
 			return err
 		}
 		return nil
@@ -1053,7 +1072,7 @@ func init() {
 		if message != "" {
 			err = errors.New(message)
 		}
-		if !isUUID5(str) {
+		if !isEmpty(value) && !isUUID5(str) {
 			return err
 		}
 		return nil
@@ -1070,7 +1089,7 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, strings.Join(rng, ", "))
 		}
-		if !isIn(rng, str) {
+		if !isEmpty(value) && !isIn(rng, str) {
 			return err
 		}
 		return nil
@@ -1087,7 +1106,7 @@ func init() {
 		if message != "" {
 			err = fmt.Errorf(message, strings.Join(rng, ", "))
 		}
-		if isIn(rng, str) {
+		if !isEmpty(value) && isIn(rng, str) {
 			return err
 		}
 		return nil
